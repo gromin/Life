@@ -78,6 +78,10 @@ class App extends React.Component {
     this.setState({running: !this.state.running})
   }
 
+  handleClearClick = () => {
+    this.setState({field: {}})
+  }
+
   handleLoadClick = () => {
     console.debug('Load')
     if (this.fileInput) {
@@ -280,17 +284,25 @@ class App extends React.Component {
     return (
       <span style={{margin: '0 0.4em'}}>
         <button onClick={this.toggleDrawMode}>{this.state.drawing ? 'Exit Draw Mode' : 'Enter Draw Mode'}</button>
-        &nbsp;
-        {!this.state.drawing ? <button onClick={this.handleLoadClick}>Load from file</button> : null}
-        <input
-          type="file"
-          style={{display: 'none'}}
-          onChange={this.handleFileSelected}
-          ref={ref => this.fileInput = ref}
-        />
-        <a href="#" style={{display: 'none'}} target="_blank" ref={ref => this.fileOutput = ref} />
-        &nbsp;
-        {!this.state.drawing ? <button onClick={this.handleSaveClick}>Save to file</button> : null}
+        <span style={{display: this.state.drawing ? 'none' : 'inline'}}>
+          &nbsp;/&nbsp;
+          <button onClick={this.handleClearClick}>Clear entire field</button>
+          &nbsp;/&nbsp;
+          <button onClick={this.handleLoadClick}>Load art from .txt file</button>
+          <input
+            type="file"
+            style={{display: 'none'}}
+            onChange={this.handleFileSelected}
+            ref={ref => this.fileInput = ref}
+          />
+          <a href="#" style={{display: 'none'}} target="_blank" ref={ref => this.fileOutput = ref} />
+          &nbsp;
+          <button onClick={this.handleSaveClick}>Save art to .txt file</button>
+          &nbsp;/&nbsp;
+          <button onClick={this.handleLoadClick}>Load state from .json file</button>
+          &nbsp;
+          <button onClick={this.handleSaveClick}>Save state to .json file</button>
+         </span>
       </span>
     )
   }
