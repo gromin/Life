@@ -90,10 +90,10 @@ export function setFieldCell(field: object, {x: appendX, y: appendY}: Cell, valu
   const newField = {}
 
   // Copy passed `field` to `newField`
-  Object.keys(field).forEach(x => {
-    newField[x] = newField[x] || {}
-    Object.keys(field[x]).forEach(y => {
-      newField[x][y] = true
+  Object.keys(field).forEach(row => {
+    newField[row] = newField[row] || {}
+    Object.keys(field[row]).forEach(col => {
+      newField[row][col] = true
     })
   })
 
@@ -209,6 +209,8 @@ export interface AppState {
 
 class App extends React.Component {
   state: AppState
+  fileInput: HTMLInputElement | null = null
+  fileOutput: HTMLAnchorElement | null = null
 
   constructor(props: object) {
     super(props)
@@ -250,13 +252,45 @@ class App extends React.Component {
   }
 
   handleLoadClick = () => {
-    console.log('Load')
-    this.setState({field: asciiAsState(initialStateString)})
+    console.debug('Load')
+    if (this.fileInput) {
+      this.fileInput.click()
+    }
+  }
+
+  handleFileSelected = () => {
+    const file = this.fileInput && this.fileInput.files && this.fileInput.files[0]
+    if (!file) {
+      return
+    }
+    const reader = new FileReader()
+    reader.onload = () => {
+      const text = reader.result
+      this.setState({field: asciiAsState(text), tickCount: 0, fieldOffset: {x: 0, y: 0}})
+    }
+    reader.readAsText(file)
   }
 
   handleSaveClick = () => {
-    console.log('Save')
-    console.log(stateAsAscii(this.state.field, this.state.fieldWidth, this.state.fieldHeight, this.state.fieldOffset))
+    console.debug('Save to File')
+    const {field, fieldWidth, fieldHeight, fieldOffset} = this.state
+    const content = stateAsAscii(field, fieldWidth, fieldHeight, fieldOffset)
+    console.debug(content)
+    if (this.fileOutput) {
+      this.fileOutput.href = window.URL.createObjectURL(new Blob([content], {type: 'text/plain'}))
+      this.fileOutput.download = 'life-file.txt'
+      this.fileOutput.click()
+      this.fileOutput.href = '#'
+    }
+  }
+
+  handlePanCenter = () => {
+    this.setState({
+      fieldOffset: {
+        x: 0,
+        y: 0
+      }
+    })
   }
 
   handlePanLeft = () => {
@@ -388,14 +422,24 @@ class App extends React.Component {
           {this.renderCanvasControls()}
         </p>
         <p>
-          <button onClick={this.handlePlayPauseClick} disabled={this.state.drawing}>{this.state.running ? 'Pause' : 'Play'}</button>
+          <button
+            onClick={this.handlePlayPauseClick}
+            disabled={this.state.drawing}
+          >
+            {this.state.running ? 'Pause' : 'Play'}
+          </button>
           &nbsp;
           {!this.state.running ? <button onClick={this.advanceState}>&gt;</button> : null}
           &nbsp;&nbsp;&nbsp;
           {!this.state.running ? <button onClick={this.handlePanLeft}>left</button> : null}
+          &nbsp;
           {!this.state.running ? <button onClick={this.handlePanUp}>up</button> : null}
+          &nbsp;
           {!this.state.running ? <button onClick={this.handlePanDown}>down</button> : null}
+          &nbsp;
           {!this.state.running ? <button onClick={this.handlePanRight}>right</button> : null}
+          &nbsp;&nbsp;
+          {!this.state.running ? <button onClick={this.handlePanCenter}>re-center</button> : null}
         </p>
       </div>
     )
@@ -410,9 +454,16 @@ class App extends React.Component {
       <span style={{margin: '0 0.4em'}}>
         <button onClick={this.toggleDrawMode}>{this.state.drawing ? 'Exit Draw Mode' : 'Enter Draw Mode'}</button>
         &nbsp;
-        <button onClick={this.handleLoadClick}>Load from file</button>
+        {!this.state.drawing ? <button onClick={this.handleLoadClick}>Load from file</button> : null}
+        <input
+          type="file"
+          style={{display: 'none'}}
+          onChange={this.handleFileSelected}
+          ref={ref => this.fileInput = ref}
+        />
+        <a href="#" style={{display: 'none'}} target="_blank" ref={ref => this.fileOutput = ref} />
         &nbsp;
-        <button onClick={this.handleSaveClick}>Save to file</button>
+        {!this.state.drawing ? <button onClick={this.handleSaveClick}>Save to file</button> : null}
       </span>
     )
   }
