@@ -96,20 +96,30 @@ class App extends React.Component {
     }
     const reader = new FileReader()
     reader.onload = () => {
-      const text = reader.result
-      this.setState({field: asciiAsState(text), tickCount: 0, fieldOffset: {x: 0, y: 0}})
+      try {
+        const state = JSON.parse(reader.result)
+        this.setState({
+          tickCount: state.tickCount,
+          fieldWidth: state.fieldWidth,
+          fieldHeight: state.fieldHeight,
+          fieldOffset: state.fieldOffset,
+          field: state.field
+        })
+      } catch (e) {
+        alert('Wrong file format')
+      }
     }
     reader.readAsText(file)
   }
 
   handleSaveClick = () => {
     console.debug('Save to File')
-    const {field, fieldWidth, fieldHeight, fieldOffset} = this.state
-    const content = stateAsAscii(field, fieldWidth, fieldHeight, fieldOffset)
+    const {field, fieldWidth, fieldHeight, fieldOffset, tickCount} = this.state
+    const content = JSON.stringify({tickCount, fieldWidth, fieldHeight, fieldOffset, field}, null, '    ')
     console.debug(content)
     if (this.fileOutput) {
-      this.fileOutput.href = window.URL.createObjectURL(new Blob([content], {type: 'text/plain'}))
-      this.fileOutput.download = 'life-file.txt'
+      this.fileOutput.href = window.URL.createObjectURL(new Blob([content], {type: 'application/json'}))
+      this.fileOutput.download = 'life-file.json'
       this.fileOutput.click()
       this.fileOutput.href = '#'
     }
@@ -237,6 +247,16 @@ class App extends React.Component {
       <div>
         <p><strong>Life.</strong></p>
         <p>
+          <small>
+            <a
+              href="https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life"
+              target="_blank"
+            >
+              https://en.wikipedia.org/wiki/Conway's_Game_of_Life
+            </a>
+          </small>
+        </p>
+        <p>
           <input
             size={6}
             value={this.state.fieldWidth}
@@ -253,12 +273,8 @@ class App extends React.Component {
           {this.renderCanvasControls()}
         </p>
         <p>
-          <button
-            onClick={this.handlePlayPauseClick}
-            disabled={this.state.drawing}
-          >
-            {this.state.running ? 'Pause' : 'Play'}
-          </button>
+          {!this.state.drawing &&
+            <button onClick={this.handlePlayPauseClick}>{this.state.running ? 'Pause' : 'Play'}</button>}
           &nbsp;
           {!this.state.running ? <button onClick={this.advanceState}>&gt;</button> : null}
           &nbsp;&nbsp;&nbsp;
@@ -288,7 +304,7 @@ class App extends React.Component {
           &nbsp;/&nbsp;
           <button onClick={this.handleClearClick}>Clear entire field</button>
           &nbsp;/&nbsp;
-          <button onClick={this.handleLoadClick}>Load art from .txt file</button>
+          <button onClick={this.handleLoadClick}>Load state from .json file</button>
           <input
             type="file"
             style={{display: 'none'}}
@@ -296,10 +312,6 @@ class App extends React.Component {
             ref={ref => this.fileInput = ref}
           />
           <a href="#" style={{display: 'none'}} target="_blank" ref={ref => this.fileOutput = ref} />
-          &nbsp;
-          <button onClick={this.handleSaveClick}>Save art to .txt file</button>
-          &nbsp;/&nbsp;
-          <button onClick={this.handleLoadClick}>Load state from .json file</button>
           &nbsp;
           <button onClick={this.handleSaveClick}>Save state to .json file</button>
          </span>
