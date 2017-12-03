@@ -8,18 +8,18 @@ export interface Cell {
   y: number
 }
 
-export function stateAsAscii(state: object, width: number = 11, height: number = 11) {
+export function stateAsAscii(state: object, width: number = 11, height: number = 11, center: Cell = {x: 0, y: 0}) {
   let str = ''
 
-  const startY = -Math.floor(height / 2),
-          endY =  Math.ceil(height / 2),
-        startX = -Math.floor(width / 2),
-          endX =  Math.ceil(width / 2)
+  const startY = center.y - Math.floor(height / 2),
+          endY = center.y + Math.ceil(height / 2),
+        startX = center.x - Math.floor(width / 2),
+          endX = center.x + Math.ceil(width / 2)
 
   for (let y = startY; y < endY; y++) {
     for (let x = startX; x < endX; x++) {
       const isAlive = state[x.toString()] && state[x.toString()][y.toString()]
-      str += (isAlive ? '*' : 'o')
+      str += (isAlive ? '*' : '.')
     }
     if (y < endY) { str += '\n' }
   }
@@ -201,6 +201,7 @@ export interface AppState {
   field: object
   fieldWidth: number
   fieldHeight: number
+  fieldOffset: Cell
   tickCount: number
   running: boolean
   drawing: boolean
@@ -213,8 +214,9 @@ class App extends React.Component {
     super(props)
     this.state = {
       field: initialState,
-      fieldWidth: 30,
-      fieldHeight: 20,
+      fieldWidth: 20,
+      fieldHeight: 18,
+      fieldOffset: {x: 0, y: 0},
       tickCount: 0,
       running: false,
       drawing: false
@@ -254,7 +256,43 @@ class App extends React.Component {
 
   handleSaveClick = () => {
     console.log('Save')
-    console.log(stateAsAscii(this.state.field, this.state.fieldWidth, this.state.fieldHeight))
+    console.log(stateAsAscii(this.state.field, this.state.fieldWidth, this.state.fieldHeight, this.state.fieldOffset))
+  }
+
+  handlePanLeft = () => {
+    this.setState({
+      fieldOffset: {
+        ...this.state.fieldOffset,
+        x: this.state.fieldOffset.x + Math.ceil(this.state.fieldWidth / 4)
+      }
+    })
+  }
+
+  handlePanRight = () => {
+    this.setState({
+      fieldOffset: {
+        ...this.state.fieldOffset,
+        x: this.state.fieldOffset.x - Math.ceil(this.state.fieldWidth / 4)
+      }
+    })
+  }
+
+  handlePanUp = () => {
+    this.setState({
+      fieldOffset: {
+        ...this.state.fieldOffset,
+        y: this.state.fieldOffset.y + Math.ceil(this.state.fieldHeight / 4)
+      }
+    })
+  }
+
+  handlePanDown = () => {
+    this.setState({
+      fieldOffset: {
+        ...this.state.fieldOffset,
+        y: this.state.fieldOffset.y - Math.ceil(this.state.fieldHeight / 4)
+      }
+    })
   }
 
   handleCellClick = (e: any) => {
@@ -277,8 +315,8 @@ class App extends React.Component {
     const y = Math.floor(idx / this.state.fieldWidth),
           x = (idx - y * this.state.fieldWidth)
 
-    const alignedX = x - Math.floor(this.state.fieldWidth / 2),
-          alignedY = y - Math.floor(this.state.fieldHeight / 2)
+    const alignedX = x - Math.floor(this.state.fieldWidth / 2) + this.state.fieldOffset.x,
+          alignedY = y - Math.floor(this.state.fieldHeight / 2) + this.state.fieldOffset.y
 
     const alignedCell = {x: alignedX, y: alignedY}
     const newValue = !cellValue(this.state.field, alignedCell)
@@ -304,8 +342,9 @@ class App extends React.Component {
   }
 
   renderField() {
-    const {field, fieldWidth: width, fieldHeight: height} = this.state
-    const asciiArray: string[] = stateAsAscii(field, width, height).split('\n').join('').split('')
+    const {field, fieldWidth: width, fieldHeight: height, fieldOffset} = this.state
+
+    const asciiArray: string[] = stateAsAscii(field, width, height, fieldOffset).split('\n').join('').split('')
 
     const cells =
       asciiArray
@@ -352,6 +391,11 @@ class App extends React.Component {
           <button onClick={this.handlePlayPauseClick} disabled={this.state.drawing}>{this.state.running ? 'Pause' : 'Play'}</button>
           &nbsp;
           {!this.state.running ? <button onClick={this.advanceState}>&gt;</button> : null}
+          &nbsp;&nbsp;&nbsp;
+          {!this.state.running ? <button onClick={this.handlePanLeft}>left</button> : null}
+          {!this.state.running ? <button onClick={this.handlePanUp}>up</button> : null}
+          {!this.state.running ? <button onClick={this.handlePanDown}>down</button> : null}
+          {!this.state.running ? <button onClick={this.handlePanRight}>right</button> : null}
         </p>
       </div>
     )
@@ -365,7 +409,9 @@ class App extends React.Component {
     return (
       <span style={{margin: '0 0.4em'}}>
         <button onClick={this.toggleDrawMode}>{this.state.drawing ? 'Exit Draw Mode' : 'Enter Draw Mode'}</button>
+        &nbsp;
         <button onClick={this.handleLoadClick}>Load from file</button>
+        &nbsp;
         <button onClick={this.handleSaveClick}>Save to file</button>
       </span>
     )
