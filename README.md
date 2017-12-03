@@ -2,6 +2,10 @@
 
 A simple implementation of Conway's Life. Written with react and typescript.
 
+## Live demo
+
+https://gromin.github.io/Life/
+
 ## State and ticks
 
 1) Board is infinte in every direction, cell coordinates are counted from [0, 0] and can be negative
