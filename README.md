@@ -17,12 +17,13 @@ You can use 'pause' and 'play' buttons to stop or fast-forward current state. In
 
 ## Persistent store
 
-There is possibility to save current state to file as ascii string of all living cells. This file is readable back by program to seed initial state.
+There is possibility to save current state to json file. This file is readable back by program to seed initial state.
 
 ## TODO
 
 * ~~Implement panning~~
 * ~~Implement file I/O~~
-* Optimize Field's DOM representation
+* Optimize Field's DOM representation (get rid of inline blocks)
 * Implement app's state through redux's store
 * Implement field's manipulation functions as reducers over redux's store
+* Optimize Field's internal representation, to accomodate really big fields
