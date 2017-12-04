@@ -39,7 +39,7 @@ There is possibility to save current state to json file. This file is readable b
 
 * ~~Implement panning~~
 * ~~Implement file I/O~~
-* Optimize Field's DOM representation (get rid of inline blocks)
+* ~~Optimize Field's DOM representation (get rid of inline blocks)~~
 * Implement app's state through redux's store
 * Implement field's manipulation functions as reducers over redux's store
 * Optimize Field's internal representation, to accomodate really big fields
