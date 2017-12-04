@@ -32,6 +32,7 @@ export interface AppState {
   fieldHeight: number
   fieldOffset: Cell
   tickCount: number
+  frameRate: number
   running: boolean
   drawing: boolean
 }
@@ -52,6 +53,7 @@ class App extends React.Component {
       fieldHeight: 18,
       fieldOffset: {x: 0, y: 0},
       tickCount: 0,
+      frameRate: 4,
       running: false,
       drawing: false
     }
@@ -72,7 +74,7 @@ class App extends React.Component {
     if (this.state.running) {
       this.advanceState()
     }
-    setTimeout(this.processTimerTick, 1000 / 4)
+    setTimeout(this.processTimerTick, 1000 / this.state.frameRate)
   }
 
   advanceState = () => {
@@ -290,6 +292,13 @@ class App extends React.Component {
           {this.renderCanvasControls()}
         </p>
         <p>
+          <input
+            size={4}
+            value={this.state.frameRate}
+            onChange={e => this.setState({frameRate: Math.max(0, Math.min(30, parseInt(e.target.value, 10)))})}
+          />
+          <small>&nbsp;fps</small>
+          &nbsp;
           {!this.state.drawing &&
             <button onClick={this.handlePlayPauseClick}>{this.state.running ? 'Pause' : 'Play'}</button>}
           &nbsp;
