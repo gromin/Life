@@ -53,14 +53,14 @@ class App extends React.Component {
   }
 
   componentDidMount() {
-    setInterval(
-      () => {
-        if (!this.state.running) {
-          return
-        }
-        this.advanceState()
-      },
-      1000 / 4)
+    this.processTimerTick()
+  }
+
+  processTimerTick = () => {
+    if (this.state.running) {
+      this.advanceState()
+    }
+    setTimeout(this.processTimerTick, 1000 / 4)
   }
 
   advanceState = () => {
@@ -83,7 +83,7 @@ class App extends React.Component {
   }
 
   handleLoadClick = () => {
-    console.debug('Load')
+    // console.debug('Load')
     if (this.fileInput) {
       this.fileInput.click()
     }
@@ -113,10 +113,10 @@ class App extends React.Component {
   }
 
   handleSaveClick = () => {
-    console.debug('Save to File')
+    // console.debug('Save to File')
     const {field, fieldWidth, fieldHeight, fieldOffset, tickCount} = this.state
     const content = JSON.stringify({tickCount, fieldWidth, fieldHeight, fieldOffset, field}, null, '    ')
-    console.debug(content)
+    // console.debug(content)
     if (this.fileOutput) {
       this.fileOutput.href = window.URL.createObjectURL(new Blob([content], {type: 'application/json'}))
       this.fileOutput.download = 'life-file.json'
@@ -221,25 +221,47 @@ class App extends React.Component {
 
     const asciiArray: string[] = stateAsAscii(field, width, height, fieldOffset).split('\n').join('').split('')
 
-    const cells =
-      asciiArray
-        .reduce(
-          (nodes: JSX.Element[], nextChar: string, idx: number) => {
-            const className = `Cell ${nextChar === '*' ? 'Cell--Live' : 'Cell--Dead'}`
-            const cellSpan = <span key={`Cell-${idx}`} className={className} data-idx={idx}><span /></span>
-            return nodes.concat(cellSpan)
-          },
-          [])
+    const cells = []
+
+    for (let idx = 0; idx < asciiArray.length; idx++) {
+      const nextChar = asciiArray[idx]
+      const className = `Cell ${nextChar === '*' ? 'Cell--Live' : 'Cell--Dead'}`
+      const cellSpan = (
+        <td
+          key={`Cell-${idx}`}
+          className={className}
+          data-idx={idx}
+          style={{width: '30px', height: '30px'}}
+        >
+          <span />
+        </td>
+      )
+      cells.push(cellSpan)
+    }
 
     return (
-      <div
+      <table
         className="Cells"
         style={{width: 30 * width, height: 30 * height}}
         onClick={this.handleCellClick}
       >
-        {cells}
-      </div>
+        <tbody>
+          {this.renderRows(cells)}
+        </tbody>
+      </table>
     )
+  }
+
+  renderRows(cells: JSX.Element[]) {
+    const rows = []
+    for (let row = 0; row < this.state.fieldHeight; row++) {
+      rows.push(
+        <tr key={`Row-${row}`} data-row={row}>
+          {cells.slice(row * this.state.fieldWidth, row * this.state.fieldWidth + this.state.fieldWidth)}
+        </tr>
+      )
+    }
+    return rows
   }
 
   renderControls() {

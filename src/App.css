@@ -26,21 +26,14 @@
 }
 
 .Cells {
-  /*width: calc(11 * 30px);*/
-  /*height: calc(18 * 30px);*/
-  border-right: 1px solid #dedede;
-  border-bottom: 1px solid #dedede;
+  table-layout: fixed;
+  border-collapse: collapse;
   font-size: 0;
   line-height: 0;
 }
 
 .Cell {
-  display: inline-block;
-  box-sizing: border-box;
-  width: 30px;
-  height: 30px;
-  border-top: 1px solid #dedede;
-  border-left: 1px solid #dedede;
+  border: 1px solid #dedede;
   font-size: 0px;
   line-height: 0;
 }

@@ -36,33 +36,33 @@ export function getDeadNeighbors(state: object, {x, y}: Cell) {
 }
 
 export function setFieldCell(field: object, {x: appendX, y: appendY}: Cell, value: boolean = true) {
-  const newField = {}
+  // const newField = {}
 
   // Copy passed `field` to `newField`
-  Object.keys(field).forEach(row => {
-    newField[row] = newField[row] || {}
-    Object.keys(field[row]).forEach(col => {
-      newField[row][col] = true
-    })
-  })
+  // Object.keys(field).forEach(row => {
+  //   newField[row] = newField[row] || {}
+  //   Object.keys(field[row]).forEach(col => {
+  //     newField[row][col] = true
+  //   })
+  // })
 
   const x = appendX.toString(),
         y = appendY.toString()
 
   if (value === true) {
-    newField[x] = newField[x] || {}
-    newField[x][y] = true
+    field[x] = field[x] || {}
+    field[x][y] = true
   } else {
-    if (newField[x] && newField[x][y]) {
-      delete newField[x][y]
-      if (Object.keys(newField[x]).length === 0) {
-        delete newField[x]
+    if (field[x] && field[x][y]) {
+      delete field[x][y]
+      if (Object.keys(field[x]).length === 0) {
+        delete field[x]
       }
     }
   }
 
-  console.debug('appending', newField, {appendX, appendY})
-  return newField
+  // console.debug('appending', field, {appendX, appendY})
+  return field
 }
 
 export function tick(state: object = {}) {
@@ -77,22 +77,22 @@ export function tick(state: object = {}) {
       let y: number = parseInt(col, 10)
       
       const cell: Cell = {x, y}
-      console.debug('processing cell', cell)
+      // console.debug('processing cell', cell)
 
       // Transfer old living cell to new state only when she has 2 or 3 living neighbours
       const neighboursCount = countNeighbours(state, cell)
-      console.debug('processing cell count', neighboursCount)
+      // console.debug('processing cell count', neighboursCount)
       if (neighboursCount === 2 || neighboursCount === 3) {
         newState = setFieldCell(newState, cell)
       }
 
       // For each living cell look at her dead neighbours, as life can reproduce itself there
       const deadNeighbours = getDeadNeighbors(state, cell)
-      console.debug('processing cell dead neighbours', deadNeighbours)
+      // console.debug('processing cell dead neighbours', deadNeighbours)
       deadNeighbours.forEach(deadCell => {
         // Skip already processed dead cells
         if (computedDeadCells[deadCell.x] && computedDeadCells[deadCell.x][deadCell.y]) {
-          console.debug('processing cell dead neighbour computed cache hit', deadCell)
+          // console.debug('processing cell dead neighbour computed cache hit', deadCell)
           return
         }
         // Let there be new Life, sometimes
