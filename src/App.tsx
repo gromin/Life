@@ -297,14 +297,14 @@ class App extends React.Component {
             size={6}
             value={this.state.fieldWidth}
             readOnly={this.state.running}
-            onChange={e => this.setState({fieldWidth: parseInt(e.target.value, 10)})}
+            onChange={e => this.setState({fieldWidth: parseInt(e.target.value, 10) || 0})}
           />
           &nbsp;x&nbsp;
           <input
             size={6}
             value={this.state.fieldHeight}
             readOnly={this.state.running}
-            onChange={e => this.setState({fieldHeight: parseInt(e.target.value, 10)})}
+            onChange={e => this.setState({fieldHeight: parseInt(e.target.value, 10) || 0})}
           />
           {this.renderCanvasControls()}
         </p>
@@ -312,7 +312,7 @@ class App extends React.Component {
           <input
             size={4}
             value={this.state.frameRate}
-            onChange={e => this.setState({frameRate: Math.max(0, Math.min(30, parseInt(e.target.value, 10)))})}
+            onChange={e => this.setState({frameRate: Math.max(1, Math.min(30, parseInt(e.target.value, 10) || 0))})}
           />
           <small>&nbsp;fps</small>
           &nbsp;
