@@ -43,7 +43,7 @@ class App extends React.Component {
   domField: Field | null = null
   fileInput: HTMLInputElement | null = null
   fileOutput: HTMLAnchorElement | null = null
-  updateTimeout: number
+  updateTimeout: any
 
   constructor(props: object) {
     super(props)
