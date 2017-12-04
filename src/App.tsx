@@ -60,9 +60,9 @@ class App extends React.Component {
   }
 
   componentDidMount() {
-    this.processTimerTick()
-    clearTimeout(this.updateTimeout)
+    this.handleFitScreen()
     this.updateTimeout = window.setTimeout(this.updateField, 1)
+    this.processTimerTick()
   }
 
   componentDidUpdate(nextProps: {}, nextState: AppState) {
@@ -137,6 +137,20 @@ class App extends React.Component {
       this.fileOutput.click()
       this.fileOutput.href = '#'
     }
+  }
+
+  handleFitScreen = () => {
+    const domTable = this.domField && this.domField.domTable
+
+    if (!domTable) {
+      return
+    }
+
+    const tableBounds = domTable.getBoundingClientRect()
+    const width = Math.floor((window.outerWidth - tableBounds.left * 2) / 30)
+    const height = Math.floor((window.innerHeight - tableBounds.top) / 30 - 1)
+
+    this.setState({fieldWidth: Math.max(1, Math.min(100, width)), fieldHeight: Math.max(1, Math.min(100, height))})
   }
 
   handlePanCenter = () => {
@@ -319,10 +333,14 @@ class App extends React.Component {
 
     return (
       <span style={{margin: '0 0.4em'}}>
+        <button onClick={this.handleFitScreen}>Fit screen</button>
+        &nbsp;/&nbsp;
         <button onClick={this.toggleDrawMode}>{this.state.drawing ? 'Exit Draw Mode' : 'Enter Draw Mode'}</button>
-        <span style={{display: this.state.drawing ? 'none' : 'inline'}}>
+        <span style={{display: this.state.drawing ? 'inline' : 'none'}}>
           &nbsp;/&nbsp;
           <button onClick={this.handleClearClick}>Clear entire field</button>
+        </span>
+        <span style={{display: this.state.drawing ? 'none' : 'inline'}}>
           &nbsp;/&nbsp;
           <button onClick={this.handleLoadClick}>Load state from .json file</button>
           <input
