@@ -166,7 +166,7 @@ class App extends React.Component {
     this.setState({
       fieldOffset: {
         ...this.state.fieldOffset,
-        x: this.state.fieldOffset.x + 1
+        x: this.state.fieldOffset.x - 1
       }
     })
   }
@@ -175,7 +175,7 @@ class App extends React.Component {
     this.setState({
       fieldOffset: {
         ...this.state.fieldOffset,
-        x: this.state.fieldOffset.x - 1
+        x: this.state.fieldOffset.x + 1
       }
     })
   }
@@ -184,7 +184,7 @@ class App extends React.Component {
     this.setState({
       fieldOffset: {
         ...this.state.fieldOffset,
-        y: this.state.fieldOffset.y + 1
+        y: this.state.fieldOffset.y - 1
       }
     })
   }
@@ -193,7 +193,7 @@ class App extends React.Component {
     this.setState({
       fieldOffset: {
         ...this.state.fieldOffset,
-        y: this.state.fieldOffset.y - 1
+        y: this.state.fieldOffset.y + 1
       }
     })
   }
