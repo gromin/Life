@@ -152,7 +152,7 @@ class App extends React.Component {
     this.setState({
       fieldOffset: {
         ...this.state.fieldOffset,
-        x: this.state.fieldOffset.x + Math.ceil(this.state.fieldWidth / 4)
+        x: this.state.fieldOffset.x + 1
       }
     })
   }
@@ -161,7 +161,7 @@ class App extends React.Component {
     this.setState({
       fieldOffset: {
         ...this.state.fieldOffset,
-        x: this.state.fieldOffset.x - Math.ceil(this.state.fieldWidth / 4)
+        x: this.state.fieldOffset.x - 1
       }
     })
   }
@@ -170,7 +170,7 @@ class App extends React.Component {
     this.setState({
       fieldOffset: {
         ...this.state.fieldOffset,
-        y: this.state.fieldOffset.y + Math.ceil(this.state.fieldHeight / 4)
+        y: this.state.fieldOffset.y + 1
       }
     })
   }
@@ -179,7 +179,7 @@ class App extends React.Component {
     this.setState({
       fieldOffset: {
         ...this.state.fieldOffset,
-        y: this.state.fieldOffset.y - Math.ceil(this.state.fieldHeight / 4)
+        y: this.state.fieldOffset.y - 1
       }
     })
   }
@@ -218,12 +218,13 @@ class App extends React.Component {
   render() {
     return (
       <div className="App">
-        <div className="App-header" onClick={this.handlePlayPauseClick}>
+        <div className="App-header">
           <img
             src={logo}
             alt="logo"
             className={['App-logo', (this.state.running ? 'App-logo--Animated' : '')].join(' ')}
           />
+          {this.renderPanControls()}
         </div>
         {this.renderControls()}
         <p>Ticks: {this.state.tickCount}</p>
@@ -304,17 +305,8 @@ class App extends React.Component {
           {!this.state.drawing &&
             <button onClick={this.handlePlayPauseClick}>{this.state.running ? 'Pause' : 'Play'}</button>}
           &nbsp;
-          {!this.state.running ? <button onClick={this.advanceState}>&gt;</button> : null}
+          {!this.state.running ? <button onClick={this.advanceState}>Next state &gt;</button> : null}
           &nbsp;&nbsp;&nbsp;
-          {!this.state.running ? <button onClick={this.handlePanLeft}>left</button> : null}
-          &nbsp;
-          {!this.state.running ? <button onClick={this.handlePanUp}>up</button> : null}
-          &nbsp;
-          {!this.state.running ? <button onClick={this.handlePanDown}>down</button> : null}
-          &nbsp;
-          {!this.state.running ? <button onClick={this.handlePanRight}>right</button> : null}
-          &nbsp;&nbsp;
-          {!this.state.running ? <button onClick={this.handlePanCenter}>re-center</button> : null}
         </p>
       </div>
     )
@@ -344,6 +336,33 @@ class App extends React.Component {
           <button onClick={this.handleSaveClick}>Save state to .json file</button>
          </span>
       </span>
+    )
+  }
+
+  renderPanControls() {
+    return (
+      <table
+        style={{
+          display: 'inline-table',
+          textAlign: 'center',
+          verticalAlign: 'middle',
+          marginTop: '15px'
+        }}
+      >
+        <tbody>
+          <tr>
+            <td colSpan={3}><button onClick={this.handlePanUp}>▲</button></td>
+          </tr>
+          <tr>
+            <td><button onClick={this.handlePanLeft}>◀</button></td>
+            <td><button onClick={this.handlePanCenter}>•</button></td>
+            <td><button onClick={this.handlePanRight}>▶</button></td>
+          </tr>
+          <tr>
+            <td colSpan={3}><button onClick={this.handlePanDown}>▼</button></td>
+          </tr>
+        </tbody>
+      </table>
     )
   }
 }
