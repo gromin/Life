@@ -43,7 +43,7 @@ class App extends React.Component {
   domField: Field | null = null
   fileInput: HTMLInputElement | null = null
   fileOutput: HTMLAnchorElement | null = null
-  updateTimeout: any
+  updateTimeout: number
 
   constructor(props: object) {
     super(props)
@@ -62,19 +62,19 @@ class App extends React.Component {
   componentDidMount() {
     this.processTimerTick()
     clearTimeout(this.updateTimeout)
-    this.updateTimeout = setTimeout(this.updateField, 1)
+    this.updateTimeout = window.setTimeout(this.updateField, 1)
   }
 
-  componentDidUpdate(nextProps: any, nextState: AppState) {
+  componentDidUpdate(nextProps: {}, nextState: AppState) {
     clearTimeout(this.updateTimeout)
-    this.updateTimeout = setTimeout(this.updateField, 1)
+    this.updateTimeout = window.setTimeout(this.updateField, 1)
   }
 
   processTimerTick = () => {
     if (this.state.running) {
       this.advanceState()
     }
-    setTimeout(this.processTimerTick, 1000 / this.state.frameRate)
+    window.setTimeout(this.processTimerTick, 1000 / this.state.frameRate)
   }
 
   advanceState = () => {
@@ -184,23 +184,25 @@ class App extends React.Component {
     })
   }
 
-  handleCellClick = (e: any) => {
+  handleCellClick = (e: React.MouseEvent<HTMLTableElement>) => {
     if (!this.state.drawing) {
       return
     }
 
+    const target = (e.target as HTMLElement)
+
     let cell
-    if (e.target.matches('.Cell')) {
-      cell = e.target
-    } else if (e.target.parentNode.matches('.Cell')) {
-      cell = e.target.parentNode
+    if (target.matches('.Cell')) {
+      cell = target
+    } else if (target.parentElement && target.parentElement.matches('.Cell')) {
+      cell = target.parentElement
     }
 
     if (!cell) {
       return
     }
 
-    const idx = parseInt(cell.getAttribute('data-idx'), 10)
+    const idx = parseInt(cell.getAttribute('data-idx') || '', 10)
     const y = Math.floor(idx / this.state.fieldWidth),
           x = (idx - y * this.state.fieldWidth)
 

@@ -3,7 +3,7 @@ import * as React from 'react'
 export interface FieldProps {
   width: number
   height: number
-  onClick: (e: any) => void
+  onClick: (e: React.MouseEvent<HTMLTableElement>) => void
 }
 
 export default class Field extends React.Component {
