@@ -10,6 +10,8 @@ import {
   asciiAsState
 } from './LifeState'
 
+import Field from './Field'
+
 const logo = require('./logo.svg')
 
 const initialStateString = `
@@ -36,8 +38,11 @@ export interface AppState {
 
 class App extends React.Component {
   state: AppState
+
+  domField: Field | null = null
   fileInput: HTMLInputElement | null = null
   fileOutput: HTMLAnchorElement | null = null
+  updateTimeout: number
 
   constructor(props: object) {
     super(props)
@@ -54,6 +59,13 @@ class App extends React.Component {
 
   componentDidMount() {
     this.processTimerTick()
+    clearTimeout(this.updateTimeout)
+    this.updateTimeout = setTimeout(this.updateField, 1)
+  }
+
+  componentDidUpdate(nextProps: any, nextState: AppState) {
+    clearTimeout(this.updateTimeout)
+    this.updateTimeout = setTimeout(this.updateField, 1)
   }
 
   processTimerTick = () => {
@@ -217,51 +229,34 @@ class App extends React.Component {
   }
 
   renderField() {
-    const {field, fieldWidth: width, fieldHeight: height, fieldOffset} = this.state
-
-    const asciiArray: string[] = stateAsAscii(field, width, height, fieldOffset).split('\n').join('').split('')
-
-    const cells = []
-
-    for (let idx = 0; idx < asciiArray.length; idx++) {
-      const nextChar = asciiArray[idx]
-      const className = `Cell ${nextChar === '*' ? 'Cell--Live' : 'Cell--Dead'}`
-      const cellSpan = (
-        <td
-          key={`Cell-${idx}`}
-          className={className}
-          data-idx={idx}
-          style={{width: '30px', height: '30px'}}
-        >
-          <span />
-        </td>
-      )
-      cells.push(cellSpan)
-    }
-
     return (
-      <table
-        className="Cells"
-        style={{width: 30 * width, height: 30 * height}}
+      <Field
+        width={this.state.fieldWidth}
+        height={this.state.fieldHeight}
+        ref={ref => this.domField = ref}
         onClick={this.handleCellClick}
-      >
-        <tbody>
-          {this.renderRows(cells)}
-        </tbody>
-      </table>
+      />
     )
   }
 
-  renderRows(cells: JSX.Element[]) {
-    const rows = []
-    for (let row = 0; row < this.state.fieldHeight; row++) {
-      rows.push(
-        <tr key={`Row-${row}`} data-row={row}>
-          {cells.slice(row * this.state.fieldWidth, row * this.state.fieldWidth + this.state.fieldWidth)}
-        </tr>
-      )
+  updateField = () => {
+    const {field, fieldWidth: width, fieldHeight: height, fieldOffset} = this.state
+    const asciiArray: string[] = stateAsAscii(field, width, height, fieldOffset).split('\n').join('').split('')
+    const domTable = this.domField && this.domField.domTable
+
+    if (!domTable) {
+      return
     }
-    return rows
+
+    const domCells = Array.from(domTable.querySelectorAll('td'))
+
+    domCells.forEach((domCell, idx) => {
+      if (asciiArray[idx] === '*') {
+        domCell.className = 'Cell Cell--Live'
+      } else {
+        domCell.className = 'Cell Cell--Dead'
+      }
+    })
   }
 
   renderControls() {

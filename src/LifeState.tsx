@@ -111,7 +111,7 @@ export function tick(state: object = {}) {
 }
 
 export function stateAsAscii(state: object, width: number = 11, height: number = 11, center: Cell = {x: 0, y: 0}) {
-  let str = ''
+  let str = []
 
   const startY = center.y - Math.floor(height / 2),
           endY = center.y + Math.ceil(height / 2),
@@ -121,11 +121,11 @@ export function stateAsAscii(state: object, width: number = 11, height: number =
   for (let y = startY; y < endY; y++) {
     for (let x = startX; x < endX; x++) {
       const isAlive = state[x.toString()] && state[x.toString()][y.toString()]
-      str += (isAlive ? '*' : '.')
+      str.push(isAlive ? '*' : '.')
     }
-    if (y < endY) { str += '\n' }
+    if (y < endY) { str.push('\n') }
   }
-  return str
+  return str.join('')
 }
 
 export function asciiAsState(ascii: string) {

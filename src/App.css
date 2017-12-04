@@ -42,14 +42,15 @@
   display: block;
   width: 100%;
   height: 100%;
-  background: #333;
-  transition: transform 0.1s, opacity 0.1s;
+  background: #fff;
+  /*transition: transform 0.1s, opacity 0.1s;*/
 }
 
-.Cell--Live {
+.Cell--Live > span {
+  background: #333;
 }
 
 .Cell--Dead > span {
-  transform: scale(0);
-  opacity: 0;
+  /*transform: scale(0);*/
+  /*opacity: 0;*/
 }
